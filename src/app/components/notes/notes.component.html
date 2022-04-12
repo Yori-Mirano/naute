@@ -1,0 +1,20 @@
+<div style="text-align: center">
+  <button (click)="loadPreviousNotes();">Load previous notes</button>
+  <button (click)="unloadPreviousNotes()">Unload previous notes</button>
+</div>
+
+<ul class="card-list">
+  <li *ngFor="let note of notes$|async; trackBy:trackNoteById">
+    <app-note #note [note]="note"></app-note>
+  </li>
+
+
+  <li class="card-list__new-card">
+    <button class="card-list__new-button" (click)="createNote()">CRÉER UNE NOTE</button>
+  </li>
+</ul>
+
+<div style="text-align: center">
+  <button (click)="loadNextNotes()">Load next notes</button>
+  <button (click)="unloadNextNotes()">Unload next notes</button>
+</div>

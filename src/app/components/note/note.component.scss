@@ -1,0 +1,38 @@
+.note {
+  $self: &;
+  position: relative;
+  display: block;
+
+  &__time {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+
+    &:first-letter {
+      text-transform: uppercase;
+    }
+  }
+
+  &__close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    color: #888;
+    border: 1px solid currentColor;
+    font-size: 2rem;
+    line-height: 2rem;
+    height: 2.2rem;
+    width: 2.2rem;
+    border-radius: calc(var(--border-radius) / 2);
+
+    #{$self}:hover &,
+    &:focus {
+      border: none;
+      background: #c94362;
+      color: #fff;
+    }
+  }
+}
+

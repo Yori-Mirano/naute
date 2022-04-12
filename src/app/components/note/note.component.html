@@ -1,0 +1,13 @@
+<label class="note">
+  <time class="note__time">{{note.date | date: 'EEEE d MMMM YYYY à H:mm'}}</time>
+
+  <textarea #textarea
+            [(ngModel)]="note.content"
+            class="no-outline overflow-hidden"
+            rows="1"
+            (input)="ajustHeight(); autosave()"
+            (change)="save();">
+  </textarea>
+
+  <button class="note__close-button" (click)="delete()">×</button>
+</label>
