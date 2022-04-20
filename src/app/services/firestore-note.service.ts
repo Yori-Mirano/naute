@@ -17,31 +17,21 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
   step    = 5;
   range   = this.step;
   fromEnd = true;
-  indexStart!: FirestoreNote;
-  indexEnd!: FirestoreNote;
+  queryFirstNotes = false;
+  isLastNotes = false;
+  indexStart!: FirestoreNote|null;
+  indexEnd!: FirestoreNote|null;
   subscription!: Subscription;
 
   constructor(private firestore: AngularFirestore) {}
 
-  create(): Note { // Promise<DocumentReference<Note>>
+  create(): Promise<void> {
     const note = {
-      date: Date.now(),
+      createdAt: Date.now(),
       content: ''
     };
 
-    const firestoreNote = {
-      date: Timestamp.now(),
-      content: ''
-    };
-
-    this.indexEnd = firestoreNote;
-    this.fromEnd  = true;
-    this.range    = this.step;
-
-    this.notesCollection.add({ ...firestoreNote })
-      .then(() => this.loadLast());
-
-    return note;
+    return this.persist(note);
   }
 
   delete(note: Note) {
@@ -54,14 +44,27 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
   }
 
   loadFirst(): void {
+    this.isLastNotes = false;
+    this.indexStart = null;
+    this.indexEnd   = null;
+    this.range      = this.step;
+    this.fromEnd    = false;
+    this.queryFirstNotes = true;
+    this.refresh();
   }
 
   loadLast(): void {
+    this.isLastNotes = true;
+    this.indexStart = null;
+    this.indexEnd   = null;
+    this.range      = this.step;
+    this.fromEnd    = true;
+    this.queryFirstNotes = false;
     this.refresh();
   }
 
   loadNext(): void {
-    this.range += this.step;
+    this.range += this.isLastNotes ? 0 : this.step;
     this.fromEnd = false;
     this.refresh();
   }
@@ -72,11 +75,34 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
     this.refresh();
   }
 
-  persist(note: Note): void {
-    this.notesCollection.doc(note.id).update({content: note.content});
+  persist(note: Note): Promise<void> {
+    return new Promise<void>(resolve => {
+      if (note.id) {
+        this.notesCollection.doc(note.id).update(
+          {
+            updatedAt: note.updatedAt ? Timestamp.fromMillis(note.updatedAt) : undefined,
+            content: note.content
+          }
+        ).then(() => resolve());
+
+      } else {
+        const firestoreNote = {
+          createdAt: Timestamp.fromMillis(note.createdAt),
+          content: note.content
+        };
+
+        this.indexEnd = firestoreNote;
+        this.fromEnd  = true;
+        this.range    = this.step;
+
+        this.notesCollection.add({ ...firestoreNote })
+          .then(() => resolve());
+      }
+    });
   }
 
   unloadNext(): void {
+    this.isLastNotes = false;
     this.range -= this.step;
     this.range = Math.max(1, this.range);
     this.fromEnd = false;
@@ -101,16 +127,16 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
       if (this.indexStart && this.indexEnd) {
         if (this.fromEnd) {
           newRef = newRef
-            .orderBy('date', 'desc')
-            .startAt(this.indexEnd.date);
+            .orderBy('createdAt', 'desc')
+            .startAt(this.indexEnd.createdAt);
 
         } else {
           newRef = newRef
-            .orderBy('date', 'asc')
-            .startAt(this.indexStart.date);
+            .orderBy('createdAt', 'asc')
+            .startAt(this.indexStart.createdAt);
         }
       } else {
-        newRef = newRef.orderBy('date', 'desc');
+        newRef = newRef.orderBy('createdAt', this.queryFirstNotes ? 'asc' : 'desc');
       }
 
       return newRef;
@@ -119,7 +145,7 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
 
     this.subscription = this.notesCollection.valueChanges({idField: 'id'}).pipe(
       tap(notes => {
-        notes.sort((noteA, noteB) => noteA.date > noteB.date ? 1 : -1)
+        notes.sort((noteA, noteB) => noteA.createdAt > noteB.createdAt ? 1 : -1)
       }),
 
       tap(notes => {
@@ -128,9 +154,10 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
       }),
 
       map(notes => notes.map(note => { return {
-        id:       note.id,
-        date:     note.date.seconds * 1000,
-        content:  note.content
+        id:         note.id,
+        createdAt:  note.createdAt.toMillis(),
+        updatedAt:  note.updatedAt ? note.updatedAt.toMillis() : undefined,
+        content:    note.content
       }})),
 
     ).subscribe(notes => {

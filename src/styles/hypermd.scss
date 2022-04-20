@@ -1,0 +1,34 @@
+$hidden-tokens: ".cm-formatting-header, cm-formatting-header, .cm-formatting-strong, .cm-formatting-em, .cm-formatting-strikethrough, .cm-formatting-link";
+
+.cm-s-hypermd-light                          span:is(#{$hidden-tokens}).hmd-hidden-token,
+.cm-s-hypermd-light:not(.CodeMirror-focused) span:is(#{$hidden-tokens}) {
+  font-size: 0 !important;
+}
+
+
+// link
+.cm-s-hypermd-light:not(.CodeMirror-focused) span:is(.cm-url) {
+  display: none !important;
+}
+
+.cm-s-hypermd-light .hmd-link-icon {
+  display: none !important;
+}
+
+
+// task
+.cm-s-hypermd-light                          span.cm-formatting-task.hmd-hidden-token,
+.cm-s-hypermd-light:not(.CodeMirror-focused) span.cm-formatting-task {
+  color: transparent !important;
+}
+
+.cm-s-hypermd-light.CodeMirror-focused span.cm-formatting-task:not(.hmd-hidden-token) {
+  background: none;
+}
+
+
+// header
+.cm-s-hypermd-light pre.HyperMD-header.HyperMD-header-1:after,
+.cm-s-hypermd-light pre.HyperMD-header.HyperMD-header-2:after {
+  content: none;
+}

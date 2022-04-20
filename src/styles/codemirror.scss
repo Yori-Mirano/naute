@@ -1,0 +1,9 @@
+.CodeMirror {
+  height: auto;
+  font-family: inherit;
+  margin-left: -4px;
+
+  &-gutters {
+    display: none;
+  }
+}

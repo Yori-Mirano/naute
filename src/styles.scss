@@ -1,10 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 
-.block { display: block; }
-.inline { display: inline; }
-.flex { display: flex; }
-.no-outline { outline: none; }
-.overflow-hidden { overflow: hidden;}
+@import "codemirror/lib/codemirror";
+@import "hypermd/theme/hypermd-light";
+@import "styles/codemirror";
+@import "styles/hypermd";
+
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -22,43 +22,38 @@ button {
   cursor: pointer;
 }
 
-textarea {
-  background: none;
-  border: none;
-  display: block;
-  width: 100%;
-  resize: none;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  padding: 0;
-}
 
 html {
   height: 100%;
-  scroll-behavior: smooth;
+  //scroll-behavior: smooth;
 }
 
 
 body {
   min-height: 100%;
   font-family: Montserrat, sans-serif;
-  background: linear-gradient(173deg, #232360, #7a39e3) fixed;
+  background: linear-gradient(173deg, #222252, #49235d) fixed;
   display: flex;
   justify-content: center;
   align-items: flex-end;
   padding: var(--view-padding);
 }
 
+
+
 .card-list {
   max-width: 35rem;
   width: 100vw;
   list-style-type: none;
   padding: 0;
-  margin: 0;
+  margin: 1rem 0;
 
   > * + * {
     border-top: 1px solid #ddd;
+  }
+
+  > *:first-child:last-child {
+    border-radius: var(--border-radius);
   }
 
   > *:first-child {
@@ -67,27 +62,30 @@ body {
 
   > *:last-child {
     border-radius: 0 0 var(--border-radius) var(--border-radius);
-    position: sticky;
-    bottom: var(--view-padding);
-    box-shadow: 0 0.25rem 1rem #048c7ecf;
   }
 
   > * {
     background-color: white;
-    padding: 1rem;
     transition: opacity .15s;
   }
 
-  &:focus-within > :not(:focus-within):not(:last-child) {
+  &:focus-within > :not(:focus-within) {
     opacity: .7;
   }
 
   &__new {
     &-card {
-      background: #d8fff6;
+      z-index: 1;
+      position: sticky;
+      bottom: var(--view-padding);
+      box-shadow: 0 0.25rem 1rem #6e001b;
+
+      border-radius: 2rem;
+      background: #d42853;
       text-align: center;
       font-weight: bold;
       padding: 0;
+      margin: 1rem .5rem;
     }
 
     &-button {
@@ -95,7 +93,7 @@ body {
       height: 4rem;
       background: none;
       border: none;
-      color: #149f7f;
+      color: #ffd9e2;
     }
   }
 }

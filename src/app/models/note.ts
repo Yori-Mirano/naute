@@ -1,5 +1,6 @@
 export interface Note {
   id?: string;
-  date: number;
+  createdAt: number;
+  updatedAt?: number;
   content: string;
 }

@@ -1,13 +1,8 @@
-<label class="note">
-  <time class="note__time">{{note.date | date: 'EEEE d MMMM YYYY à H:mm'}}</time>
+<div class="note">
+  <header class="note__header">
+    <button class="note__close-button" (click)="delete()">×</button>
+    <time class="note__time">{{note.createdAt | date: 'EEEE d MMMM YYYY à H:mm'}}</time>
+  </header>
 
-  <textarea #textarea
-            [(ngModel)]="note.content"
-            class="no-outline overflow-hidden"
-            rows="1"
-            (input)="ajustHeight(); autosave()"
-            (change)="save();">
-  </textarea>
-
-  <button class="note__close-button" (click)="delete()">×</button>
-</label>
+  <textarea #textarea [(ngModel)]="note.content"></textarea>
+</div>

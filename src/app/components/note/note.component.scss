@@ -2,36 +2,65 @@
   $self: &;
   position: relative;
   display: block;
+  padding: 0 1rem 1rem;
+
+  &__header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-top: .5rem;
+    pointer-events: none;
+
+    > * {
+      pointer-events: initial;
+    }
+  }
 
   &__time {
     display: block;
-    font-size: 1.4rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
+    color: #ccc4ee;
+    padding: .5rem 0;
+    padding-left: 1rem;
+    border-radius: 2rem 0 0 2rem;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    font-style: italic;
 
-    &:first-letter {
-      text-transform: uppercase;
+    background: white;
+    box-shadow: 0 0 .3rem .3rem white;
+
+    @supports (backdrop-filter: blur(3px)) {
+      background: #fffd;
+      box-shadow: none;
+      backdrop-filter: blur(3px);
     }
   }
 
   &__close-button {
-    position: absolute;
-    top: 0;
-    right: 0;
+    box-shadow: 0 0 .3rem .3rem white;
     background: none;
-    color: #888;
-    border: 1px solid currentColor;
     font-size: 2rem;
     line-height: 2rem;
     height: 2.2rem;
     width: 2.2rem;
+    border: none;
+    background: #c94362;
+    margin-top: .5rem;
+    padding: 0;
+    color: #fff;
+    opacity: 0;
     border-radius: calc(var(--border-radius) / 2);
+    pointer-events: none;
+    transition: opacity 150ms;
 
     #{$self}:hover &,
     &:focus {
-      border: none;
-      background: #c94362;
-      color: #fff;
+      opacity: 1;
+      pointer-events: initial;
     }
   }
 }

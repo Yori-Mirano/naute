@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
 
 import { Note } from '../../models/note';
 import { NoteComponent } from '../note/note.component';
-import { Observable, take } from "rxjs";
+import { Observable, skip, take } from "rxjs";
 import { FirestoreNoteService } from "../../services/firestore-note.service";
 
 @Component({
@@ -17,13 +17,13 @@ export class NotesComponent implements OnInit {
 
   @ViewChildren(NoteComponent) noteComponents!: QueryList<NoteComponent>;
 
-  constructor(private noteService: FirestoreNoteService, private changeDetectorRef: ChangeDetectorRef) { }
+  constructor(private noteService: FirestoreNoteService) { }
 
   ngOnInit(): void {
     this.getNotes();
     this.notes$.pipe(take(2)).subscribe(() => {
       setTimeout(() => window.scrollTo(0, document.body.scrollHeight));
-    })
+    });
   }
 
   getNotes() {
@@ -32,11 +32,15 @@ export class NotesComponent implements OnInit {
 
 
   createNote() {
-    this.noteService.create();
-    this.changeDetectorRef.detectChanges();
-    this.noteComponents.last.focus();
+    this.notes$.pipe(skip(1), take(1)).subscribe(() => {
+      requestAnimationFrame(() => {
+        this.noteComponents.last.focus();
+        window.scrollTo(0, document.body.scrollHeight)
+      });
+    });
 
-    requestAnimationFrame(() => window.scrollTo(0, document.body.scrollHeight));
+    this.noteService.create()
+      .then(() => this.noteService.loadLast());
   }
 
   loadPreviousNotes() {
@@ -55,7 +59,7 @@ export class NotesComponent implements OnInit {
     this.noteService.unloadNext();
   }
 
-  trackNoteById(note: any): string {
-    return note && note.id
+  trackNoteById(index: number, note: any): string {
+    return note && note.id;
   }
 }

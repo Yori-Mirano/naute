@@ -2,8 +2,8 @@ import { Note } from "../models/note";
 import { Observable } from "rxjs";
 
 export interface NoteService {
-  create(): Note;
-  persist(note: Note): void;
+  create(): Promise<void>;
+  persist(note: Note): Promise<void>;
   delete(note: Note): void
   getNotes(): Observable<Note[]>
   loadPrevious(): void;

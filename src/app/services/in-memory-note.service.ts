@@ -9,65 +9,65 @@ import { BehaviorSubject, Observable } from "rxjs";
 export class InMemoryNoteService implements NoteService{
   notes: Note[] = [
     {
-      "date": 1649456839,
+      "createdAt": 1649456839,
       "content": "1 Lorem ipsum"
     },
     {
-      "date": 1649629639,
+      "createdAt": 1649629639,
       "content": "2 Ipsum lorem"
     },
     {
-      "date": 1649456839,
+      "createdAt": 1649456839,
       "content": "3 Lorem ipsum"
     },
     {
-      "date": 1649629639,
+      "createdAt": 1649629639,
       "content": "4 Ipsum lorem"
     },
     {
-      "date": 1649456839,
+      "createdAt": 1649456839,
       "content": "5 Lorem ipsum"
     },
 
     {
-      "date": 1649629639,
+      "createdAt": 1649629639,
       "content": "6 Ipsum lorem"
     },
     {
-      "date": 1649456839,
+      "createdAt": 1649456839,
       "content": "7 Lorem ipsum"
     },
     {
-      "date": 1649629639,
+      "createdAt": 1649629639,
       "content": "8 Ipsum lorem"
     },
     {
-      "date": 1649456839,
+      "createdAt": 1649456839,
       "content": "9 Lorem ipsum"
     },
     {
-      "date": 1649629639,
+      "createdAt": 1649629639,
       "content": "10 Ipsum lorem"
     },
 
     {
-      "date": 1649629639,
+      "createdAt": 1649629639,
       "content": "11 Ipsum lorem"
     },
     {
-      "date": 1649456839,
+      "createdAt": 1649456839,
       "content": "12 Lorem ipsum"
     },
     {
-      "date": 1649629639,
+      "createdAt": 1649629639,
       "content": "13 Ipsum lorem"
     },
     {
-      "date": 1649456839,
+      "createdAt": 1649456839,
       "content": "14 Lorem ipsum"
     },
     {
-      "date": 1649629639,
+      "createdAt": 1649629639,
       "content": "15 Ipsum lorem"
     }
   ];
@@ -77,19 +77,21 @@ export class InMemoryNoteService implements NoteService{
 
   constructor() {}
 
-  create(): Note {
+  create(): Promise<void> {
     const note = {
-      date: Date.now(),
+      createdAt: Date.now(),
       content: ''
     };
 
-    this.notes.push(note);
-    this.loadLast();
-    return note;
+    return this.persist(note);
   };
 
-  persist(note: Note): void {
-    console.log('Persist note !', note);
+  persist(note: Note): Promise<void> {
+    return new Promise(resolve => {
+      console.log('Persist note !', note);
+      this.notes.push(note);
+      resolve();
+    });
   }
 
 

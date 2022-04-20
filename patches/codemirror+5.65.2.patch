@@ -1,0 +1,75 @@
+diff --git a/node_modules/codemirror/lib/codemirror.js b/node_modules/codemirror/lib/codemirror.js
+index 193d445..387685d 100644
+--- a/node_modules/codemirror/lib/codemirror.js
++++ b/node_modules/codemirror/lib/codemirror.js
+@@ -3438,6 +3438,7 @@
+   // If an editor sits on the top or bottom of the window, partially
+   // scrolled out of view, this ensures that the cursor is visible.
+   function maybeScrollWindow(cm, rect) {
++    /**
+     if (signalDOMEvent(cm, "scrollCursorIntoView")) { return }
+ 
+     var display = cm.display, box = display.sizer.getBoundingClientRect(), doScroll = null;
+@@ -3449,6 +3450,44 @@
+       scrollNode.scrollIntoView(doScroll);
+       cm.display.lineSpace.removeChild(scrollNode);
+     }
++    /**/
++    myMaybeScrollWindow(cm, rect);
++  }
++
++  function myMaybeScrollWindow(cm, rect) {
++    if (signalDOMEvent(cm, "scrollCursorIntoView")) { return }
++
++    let doScroll = false;
++    let targetPosition;
++
++    const marginTop     = cm.options.viewportScrollMarginTop    ? cm.options.viewportScrollMarginTop    : 0;
++    const marginBottom  = cm.options.viewportScrollMarginBottom ? cm.options.viewportScrollMarginBottom : 0;
++
++    const display = cm.display;
++    const box     = display.sizer.getBoundingClientRect();
++
++    const viewportScrollTopPosition     = window.scrollY;
++    const viewportHeight                = window.innerHeight;
++
++    const cursorHeight                  = rect.bottom - rect.top;
++    const cursorViewportTopPosition     = rect.top + box.top;
++    const cursorScrollTopPosition       = viewportScrollTopPosition + cursorViewportTopPosition;
++
++    if (cursorViewportTopPosition + cursorHeight > viewportHeight - marginBottom) {
++      targetPosition = cursorScrollTopPosition + cursorHeight - (viewportHeight - marginBottom);
++      doScroll = true;
++
++    } else if (cursorViewportTopPosition < marginTop) {
++      targetPosition = cursorScrollTopPosition - marginTop;
++      doScroll = true;
++    }
++
++    if (doScroll && !phantom) {
++      window.scrollTo({
++        //left: TODO
++        top: targetPosition
++      });
++    }
+   }
+ 
+   // Scroll a given position into view (immediately), verifying that
+@@ -6685,6 +6724,17 @@
+     d.cachedCharWidth = d.cachedTextHeight = d.cachedPaddingH = null;
+     d.scrollbarsClipped = false;
+     cm.setSize();
++
++    // Scroll to keep the cursor visible
++    if (cm.hasFocus()) {
++      const pos = cm.getCursor();
++      const scrollToPos = { from: pos, to: pos };
++      if (scrollToPos) {
++        const rect = scrollPosIntoView(cm, clipPos(cm.doc, scrollToPos.from),
++          clipPos(cm.doc, scrollToPos.to), scrollToPos.margin);
++        maybeScrollWindow(cm, rect);
++      }
++    }
+   }
+ 
+   var keyNames = {
