@@ -5,6 +5,7 @@ export interface NoteService {
   create(): Promise<void>;
   persist(note: Note): Promise<void>;
   delete(note: Note): void
+  getAllNotes(): Promise<Note[]>
   getNotes(): Observable<Note[]>
   loadPrevious(): void;
   loadNext(): void;

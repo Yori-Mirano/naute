@@ -2,7 +2,7 @@ import {Injectable, OnDestroy} from '@angular/core';
 import { Note } from '../models/note';
 
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { BehaviorSubject, map, Observable, Subscription, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subscription, take, tap } from 'rxjs';
 import { NoteService } from "./note-service";
 import { FirestoreNote } from "../models/firestore-note";
 import { Timestamp } from "firebase/firestore";
@@ -41,6 +41,21 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
   getNotes(): Observable<Note[]> {
     this.loadLast();
     return this.notes$.asObservable();
+  }
+
+  getAllNotes(): Promise<Note[]> {
+    return new Promise<Note[]>(resolve => {
+      const notes$ = this.firestore.collection<FirestoreNote>('notes', ref => {
+        return ref.orderBy('createdAt', 'asc').limit(100);
+      }).get();
+
+      notes$.pipe(
+          take(1),
+          map(querySnapshot => querySnapshot.docs.map(
+            queryDocumentSnapshot => this.getNoteFromFirestoreNote(queryDocumentSnapshot.data())
+          ))
+        ).subscribe(notes => resolve(notes));
+    });
   }
 
   loadFirst(): void {
@@ -140,8 +155,7 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
       }
 
       return newRef;
-      }
-    );
+    });
 
     this.subscription = this.notesCollection.valueChanges({idField: 'id'}).pipe(
       tap(notes => {
@@ -153,16 +167,20 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
         this.indexEnd   = notes[notes.length-1];
       }),
 
-      map(notes => notes.map(note => { return {
-        id:         note.id,
-        createdAt:  note.createdAt.toMillis(),
-        updatedAt:  note.updatedAt ? note.updatedAt.toMillis() : undefined,
-        content:    note.content
-      }})),
+      map(notes => notes.map(note => { return this.getNoteFromFirestoreNote(note)})),
 
     ).subscribe(notes => {
       this.notes$.next(notes)
     });
+  }
+
+  getNoteFromFirestoreNote(firestoreNote: FirestoreNote): Note {
+    return {
+      id:         firestoreNote.id,
+      createdAt:  firestoreNote.createdAt.toMillis(),
+      updatedAt:  firestoreNote.updatedAt ? firestoreNote.updatedAt.toMillis() : undefined,
+      content:    firestoreNote.content
+    }
   }
 
   ngOnDestroy(): void {
