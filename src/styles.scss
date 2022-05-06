@@ -2,8 +2,11 @@
 
 @import "codemirror/lib/codemirror";
 @import "hypermd/theme/hypermd-light";
+@import "styles/colors";
 @import "styles/codemirror";
 @import "styles/hypermd";
+@import "styles/card-list";
+@import "styles/loader";
 
 
 *, *::before, *::after {
@@ -32,68 +35,14 @@ html {
 body {
   min-height: 100%;
   font-family: Montserrat, sans-serif;
-  background: linear-gradient(173deg, #222252, #49235d) fixed;
+  background: var(--color-background);
   display: flex;
   justify-content: center;
   align-items: flex-end;
   padding: var(--view-padding);
 }
 
-
-
-.card-list {
-  max-width: 35rem;
-  width: 100vw;
-  list-style-type: none;
-  padding: 0;
-  margin: 1rem 0;
-
-  > * + * {
-    border-top: 1px solid #ddd;
-  }
-
-  > *:first-child:last-child {
-    border-radius: var(--border-radius);
-  }
-
-  > *:first-child {
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-  }
-
-  > *:last-child {
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
-  }
-
-  > * {
-    background-color: white;
-    transition: opacity .15s;
-  }
-
-  &:focus-within > :not(:focus-within) {
-    opacity: .7;
-  }
-
-  &__new {
-    &-card {
-      z-index: 1;
-      position: sticky;
-      bottom: var(--view-padding);
-      box-shadow: 0 0.25rem 1rem #6e001b;
-
-      border-radius: 2rem;
-      background: #d42853;
-      text-align: center;
-      font-weight: bold;
-      padding: 0;
-      margin: 1rem .5rem;
-    }
-
-    &-button {
-      width: 100%;
-      height: 4rem;
-      background: none;
-      border: none;
-      color: #ffd9e2;
-    }
-  }
+body {
+  margin-top: 0;
+  padding-top: 0;
 }

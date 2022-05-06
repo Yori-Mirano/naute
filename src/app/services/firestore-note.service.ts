@@ -13,15 +13,18 @@ import { Timestamp } from "firebase/firestore";
 export class FirestoreNoteService implements NoteService, OnDestroy {
   private notesCollection!: AngularFirestoreCollection<FirestoreNote>;
 
-  notes$  = new BehaviorSubject<Note[]>([]);
+  private notes$  = new BehaviorSubject<Note[]>([]);
   step    = 5;
   range   = this.step;
-  fromEnd = true;
-  queryFirstNotes = false;
-  isLastNotes = false;
-  indexStart!: FirestoreNote|null;
-  indexEnd!: FirestoreNote|null;
-  subscription!: Subscription;
+  private fromEnd = true;
+  private queryFirstNotes = false;
+  private indexStart!: FirestoreNote|null;
+  private indexEnd!: FirestoreNote|null;
+  private subscription!: Subscription;
+  private isBegin$ = new BehaviorSubject<boolean>(false);
+  private isEnd$ = new BehaviorSubject<boolean>(false);
+  isLoadingPrevious = false;
+  isLoadingNext = false;
 
   constructor(private firestore: AngularFirestore) {}
 
@@ -59,35 +62,39 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
   }
 
   loadFirst(): void {
-    this.isLastNotes = false;
     this.indexStart = null;
     this.indexEnd   = null;
     this.range      = this.step;
     this.fromEnd    = false;
     this.queryFirstNotes = true;
+    this.isBegin$.next(true);
+    this.isEnd$.next(false);
     this.refresh();
   }
 
   loadLast(): void {
-    this.isLastNotes = true;
     this.indexStart = null;
     this.indexEnd   = null;
     this.range      = this.step;
     this.fromEnd    = true;
     this.queryFirstNotes = false;
+    this.isBegin$.next(false);
+    this.isEnd$.next(true);
     this.refresh();
   }
 
-  loadNext(): void {
-    this.range += this.isLastNotes ? 0 : this.step;
+  loadNext(): Promise<Note[]> {
+    this.range += this.step;
     this.fromEnd = false;
-    this.refresh();
+    this.isLoadingNext = true;
+    return this.refresh();
   }
 
-  loadPrevious(): void {
+  loadPrevious(): Promise<Note[]> {
     this.range += this.step;
     this.fromEnd = true;
-    this.refresh();
+    this.isLoadingPrevious = true;
+    return this.refresh();
   }
 
   persist(note: Note): Promise<void> {
@@ -116,61 +123,74 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
     });
   }
 
-  unloadNext(): void {
-    this.isLastNotes = false;
+  unloadNext(): Promise<Note[]> {
     this.range -= this.step;
     this.range = Math.max(1, this.range);
     this.fromEnd = false;
-    this.refresh();
+    return this.refresh();
   }
 
-  unloadPrevious(): void {
+  unloadPrevious(): Promise<Note[]> {
     this.range -= this.step;
     this.range = Math.max(1, this.range);
     this.fromEnd = true;
-    this.refresh();
+    return this.refresh();
   }
 
-  refresh(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-
-    this.notesCollection = this.firestore.collection<FirestoreNote>('notes', ref => {
-      let newRef = ref.limit(this.range);
-
-      if (this.indexStart && this.indexEnd) {
-        if (this.fromEnd) {
-          newRef = newRef
-            .orderBy('createdAt', 'desc')
-            .startAt(this.indexEnd.createdAt);
-
-        } else {
-          newRef = newRef
-            .orderBy('createdAt', 'asc')
-            .startAt(this.indexStart.createdAt);
-        }
-      } else {
-        newRef = newRef.orderBy('createdAt', this.queryFirstNotes ? 'asc' : 'desc');
+  refresh(): Promise<Note[]> {
+    return new Promise<Note[]>(resolve => {
+      if (this.subscription) {
+        this.subscription.unsubscribe();
       }
 
-      return newRef;
-    });
+      this.notesCollection = this.firestore.collection<FirestoreNote>('notes', ref => {
+        let newRef = ref.limit(this.range);
 
-    this.subscription = this.notesCollection.valueChanges({idField: 'id'}).pipe(
-      tap(notes => {
-        notes.sort((noteA, noteB) => noteA.createdAt > noteB.createdAt ? 1 : -1)
-      }),
+        if (this.indexStart && this.indexEnd) {
+          if (this.fromEnd) {
+            newRef = newRef
+              .orderBy('createdAt', 'desc')
+              .startAt(this.indexEnd.createdAt);
 
-      tap(notes => {
-        this.indexStart = notes[0];
-        this.indexEnd   = notes[notes.length-1];
-      }),
+          } else {
+            newRef = newRef
+              .orderBy('createdAt', 'asc')
+              .startAt(this.indexStart.createdAt);
+          }
+        } else {
+          newRef = newRef.orderBy('createdAt', this.queryFirstNotes ? 'asc' : 'desc');
+        }
 
-      map(notes => notes.map(note => { return this.getNoteFromFirestoreNote(note)})),
+        return newRef;
+      });
 
-    ).subscribe(notes => {
-      this.notes$.next(notes)
+      this.subscription = this.notesCollection.valueChanges({idField: 'id'}).pipe(
+        tap(notes => {
+          notes.sort((noteA, noteB) => noteA.createdAt > noteB.createdAt ? 1 : -1)
+        }),
+
+        tap(notes => {
+          if (this.isLoadingPrevious) {
+            this.isLoadingPrevious = false;
+            this.isBegin$.next(this.fromEnd && this.indexStart?.id === notes[0].id);
+          }
+
+          if (this.isLoadingNext) {
+            this.isLoadingNext = false;
+            this.isEnd$.next(  !this.fromEnd && this.indexEnd?.id === notes[notes.length-1].id);
+          }
+
+          this.range      = notes.length;
+          this.indexStart = notes[0];
+          this.indexEnd   = notes[notes.length-1];
+        }),
+
+        map(notes => notes.map(note => { return this.getNoteFromFirestoreNote(note)})),
+
+      ).subscribe(notes => {
+        this.notes$.next(notes);
+        resolve(notes);
+      });
     });
   }
 
@@ -185,5 +205,13 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  isBegin(): BehaviorSubject<boolean> {
+    return this.isBegin$;
+  }
+
+  isEnd(): BehaviorSubject<boolean> {
+    return this.isEnd$;
   }
 }

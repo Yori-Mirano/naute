@@ -1,9 +1,10 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Note } from '../../models/note';
-import { FirestoreNoteService } from "../../services/firestore-note.service";
+//import { FirestoreNoteService } from "../../services/firestore-note.service";
 
 import * as HyperMD from 'hypermd';
 import { cm_t } from "hypermd";
+import { InMemoryNoteService } from "../../services/in-memory-note.service";
 
 @Component({
   selector: 'app-note',
@@ -18,7 +19,8 @@ export class NoteComponent implements OnInit, OnChanges {
   editor!: cm_t;
   savedAt!: number;
 
-  constructor(private noteService: FirestoreNoteService) { }
+  //constructor(private noteService: FirestoreNoteService) { }
+  constructor(private noteService: InMemoryNoteService) { }
 
   ngOnInit(): void {
     requestAnimationFrame(() => {
@@ -90,7 +92,7 @@ export class NoteComponent implements OnInit, OnChanges {
       this.noteService.persist(this.note);
 
     } else {
-      console.log('nothing to save');
+      //console.log('nothing to save');
     }
   }
 

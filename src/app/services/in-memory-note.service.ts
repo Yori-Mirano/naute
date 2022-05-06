@@ -7,78 +7,56 @@ import { BehaviorSubject, Observable } from "rxjs";
   providedIn: 'root'
 })
 export class InMemoryNoteService implements NoteService{
-  notes: Note[] = [
-    {
-      "createdAt": 1649456839,
-      "content": "1 Lorem ipsum"
-    },
-    {
-      "createdAt": 1649629639,
-      "content": "2 Ipsum lorem"
-    },
-    {
-      "createdAt": 1649456839,
-      "content": "3 Lorem ipsum"
-    },
-    {
-      "createdAt": 1649629639,
-      "content": "4 Ipsum lorem"
-    },
-    {
-      "createdAt": 1649456839,
-      "content": "5 Lorem ipsum"
-    },
-
-    {
-      "createdAt": 1649629639,
-      "content": "6 Ipsum lorem"
-    },
-    {
-      "createdAt": 1649456839,
-      "content": "7 Lorem ipsum"
-    },
-    {
-      "createdAt": 1649629639,
-      "content": "8 Ipsum lorem"
-    },
-    {
-      "createdAt": 1649456839,
-      "content": "9 Lorem ipsum"
-    },
-    {
-      "createdAt": 1649629639,
-      "content": "10 Ipsum lorem"
-    },
-
-    {
-      "createdAt": 1649629639,
-      "content": "11 Ipsum lorem"
-    },
-    {
-      "createdAt": 1649456839,
-      "content": "12 Lorem ipsum"
-    },
-    {
-      "createdAt": 1649629639,
-      "content": "13 Ipsum lorem"
-    },
-    {
-      "createdAt": 1649456839,
-      "content": "14 Lorem ipsum"
-    },
-    {
-      "createdAt": 1649629639,
-      "content": "15 Ipsum lorem"
-    }
-  ];
+  notes: Note[] = [];
   notes$  = new BehaviorSubject<Note[]>([]);
-  step    = 5;
+  step    = 10;
   index   = { start: 0, end: 0 };
 
-  constructor() {}
+  private isBegin$ = new BehaviorSubject<boolean>(false);
+  private isEnd$ = new BehaviorSubject<boolean>(false);
+
+  constructor() {
+    this.generate();
+  }
+
+  generate() {
+    const loremIpsumParagraph = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+
+    for (let i = 0; i < 1000; i++) {
+      const month = this.pad(Math.floor(Math.random() * 12) + 1);
+      const day = this.pad(Math.floor(Math.random() * 30) + 1);
+      const hours = this.pad(Math.floor(Math.random() * 24));
+      const minutes = this.pad(Math.floor(Math.random() * 60));
+
+      this.notes.push({
+        id: `${i}`,
+        createdAt: Date.parse(`2022-${month}-${day}T${hours}:${minutes}`),
+        content: ''
+      });
+    }
+
+    this.notes.sort((noteA, noteB) => noteA.createdAt > noteB.createdAt ? 1 : -1)
+
+    this.notes.forEach((note, index) => {
+      let content = `# Lorem ipsum ${index+1}`;
+
+      for (let line = 0, lineMax = Math.random() * 5; line < lineMax; line++) {
+        content += '\n\n';
+        content += loremIpsumParagraph.slice(0, Math.floor(Math.random() * loremIpsumParagraph.length)) + '.';
+      }
+
+      note.content = content;
+      note.content = `${index + 1}`;
+    })
+  }
+
+  pad(n: number): string {
+    return (n < 10 ? `0${n}` : `${n}`);
+  }
 
   create(): Promise<void> {
     const note = {
+      id: `${this.notes.length}`,
       createdAt: Date.now(),
       content: ''
     };
@@ -95,54 +73,71 @@ export class InMemoryNoteService implements NoteService{
   }
 
 
-  getNotes(): Observable<Note[]> {
-    this.loadLast();
+  getNotes(step = 0): Observable<Note[]> {
+    this.loadLast(step || this.step);
     return this.notes$.asObservable();
   }
 
 
-  loadFirst(): void {
+  loadFirst(step = 0): void {
     this.index.start  = 0;
-    this.index.end    = this.step;
+    this.index.end    = step || this.step;
     this.refresh();
   };
 
-  loadLast(): void {
-    this.index.start  = this.notes.length - this.step;
+  loadLast(step = 0): void {
+    this.index.start  = this.notes.length - (step || this.step);
     this.index.end    = this.notes.length;
     this.refresh();
   };
 
 
-  loadNext(): void {
-    this.index.end = Math.min(this.notes.length, this.index.end + this.step);
-    this.refresh();
+  loadNext(step = 0): Promise<Note[]> {
+    this.index.end = Math.min(this.notes.length, this.index.end + (step || this.step));
+    return this.refresh();
   };
 
-  loadPrevious(): void {
-    this.index.start = Math.max(0, this.index.start - this.step);
-    this.refresh();
+  loadPrevious(step = 0): Promise<Note[]> {
+    this.index.start = Math.max(0, this.index.start - (step || this.step));
+    return this.refresh();
   }
 
 
-  unloadNext(): void {
-    this.index.end = Math.max(this.index.start, this.index.end - this.step);
-    this.refresh();
+  unloadNext(step = 0): Promise<Note[]> {
+    this.index.end = Math.max(this.index.start, this.index.end - (step || this.step));
+    return this.refresh();
   }
 
-  unloadPrevious(): void {
-    this.index.start = Math.min(this.index.end, this.index.start + this.step);
-    this.refresh();
+  unloadPrevious(step = 0): Promise<Note[]> {
+    this.index.start = Math.min(this.index.end, this.index.start + (step || this.step));
+    return this.refresh();
   }
 
 
-  refresh(): void {
-    this.notes$.next(
-      this.notes.slice(this.index.start, this.index.end)
-    );
+  refresh(): Promise<Note[]> {
+    return new Promise<Note[]>(resolve => {
+      this.isBegin$.next(this.index.start == 0);
+      this.isEnd$.next(this.index.end == this.notes.length);
+
+      const notes = this.notes.slice(this.index.start, this.index.end);
+      this.notes$.next(notes);
+      resolve(notes);
+    })
   }
 
   delete(note: Note): void {
     // TODO: implement
+  }
+
+  getAllNotes(): Promise<Note[]> {
+    return Promise.resolve([]);
+  }
+
+  isBegin(): BehaviorSubject<boolean> {
+    return this.isBegin$;
+  }
+
+  isEnd(): BehaviorSubject<boolean> {
+    return this.isEnd$;
   }
 }

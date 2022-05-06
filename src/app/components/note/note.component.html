@@ -4,5 +4,5 @@
     <time class="note__time">{{note.createdAt | date: 'EEEE d MMMM YYYY à H:mm'}}</time>
   </header>
 
-  <textarea #textarea [(ngModel)]="note.content"></textarea>
+  <textarea #textarea [(ngModel)]="note.content" rows="1"></textarea>
 </div>

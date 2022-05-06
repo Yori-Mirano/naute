@@ -1,0 +1,113 @@
+.card-list {
+  max-width: 35rem;
+  width: 100vw;
+  list-style-type: none;
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  position: relative;
+  transition: margin-top 300ms;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    display: block;
+    background-image: linear-gradient(to bottom, var(--color-background), transparent);
+    /**
+    background-position: 0px -3rem;
+    background-size: 100% 10rem;
+    background-repeat: repeat-x;
+    /**/
+    height: 7rem;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 300ms;
+    z-index: 2;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    transform: translateY(100%);
+    display: block;
+    background: linear-gradient(to bottom, #FFF8, transparent);
+    height: 5rem;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+
+  &--is-top {
+    margin-top: 2rem;
+
+    > :first-child {
+      border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+  }
+
+  &:not(&--is-top) {
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &--is-bottom {
+    > :last-child {
+      border-radius: 0 0 var(--border-radius) var(--border-radius);
+    }
+  }
+
+  &:not(&--is-bottom) {
+    &::after {
+      opacity: 1;
+    }
+  }
+
+  > * + * {
+    border-top: 1px solid #ddd;
+  }
+
+  > :first-child:last-child {
+    border-radius: var(--border-radius);
+  }
+
+  > :first-child,
+  > :last-child {
+    transition: border-radius 300ms;
+  }
+
+  > * {
+    background-color: white;
+    transition: opacity .15s;
+  }
+
+  &:focus-within > :not(:focus-within) {
+    opacity: .7;
+  }
+
+  &__new {
+    &-card {
+      z-index: 1;
+      position: sticky;
+      bottom: var(--view-padding);
+      box-shadow: 0 0.25rem 1rem #6e001b;
+
+      border-radius: 2rem;
+      background: #d42853;
+      text-align: center;
+      font-weight: bold;
+      padding: 0;
+      margin: 1rem .5rem;
+    }
+
+    &-button {
+      width: 100%;
+      height: 4rem;
+      background: none;
+      border: none;
+      color: #ffd9e2;
+    }
+  }
+}

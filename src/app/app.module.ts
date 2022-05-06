@@ -14,6 +14,7 @@ import { environment } from '../environments/environment';
 
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
+import { IntersectionObserverModule } from "@ng-web-apis/intersection-observer";
 
 registerLocaleData(localeFr, 'fr');  // TODO: dynamically use the current browser locale by default
 
@@ -28,7 +29,8 @@ registerLocaleData(localeFr, 'fr');  // TODO: dynamically use the current browse
     FormsModule,
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    IntersectionObserverModule
   ],
   providers: [
     {provide: LOCALE_ID, useValue: 'fr' }

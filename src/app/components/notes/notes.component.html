@@ -1,20 +1,18 @@
-<div style="position: fixed; top: 0; left: 0; z-index: 10">
-  <button (click)="loadPreviousNotes();">Load previous notes</button><br>
-  <button (click)="unloadPreviousNotes()">Unload previous notes</button>
-</div>
+<div #scrollPositionAnchor style="position: absolute"></div>
 
-<ul class="card-list">
-  <li *ngFor="let note of notes$|async; trackBy:trackNoteById">
-    <app-note #note [note]="note"></app-note>
-  </li>
-</ul>
+<section waIntersectionObserver waIntersectionRootMargin="50%">
+  <div style="position: absolute; left: 50%; top: 1rem; z-index: 3" class="loader loader--to-top" [class.loader--off]="!isLoadingPrevious" (waIntersectionObservee)="onScrollTop($event)"></div>
+
+  <ul #list class="card-list" [class.card-list--is-top]="isBegin$ | async" [class.card-list--is-bottom]="isEnd$ | async">
+    <li *ngFor="let note of notes$|async; trackBy:trackNoteById" style="position: relative">
+      <app-note #note [note]="note"></app-note>
+    </li>
+  </ul>
+
+  <div class="loader loader--to-bottom" [class.loader--off]="!isLoadingNext" (waIntersectionObservee)="onScrollBottom($event)"></div>
+</section>
 
 
 <div class="card-list__new-card">
   <button class="card-list__new-button" (click)="createNote()">CRÉER UNE NOTE</button>
-</div>
-
-<div style="position: fixed; bottom: 0; left: 0; z-index: 10">
-  <button (click)="unloadNextNotes()">Unload next notes</button><br>
-  <button (click)="loadNextNotes()">Load next notes</button>
 </div>
