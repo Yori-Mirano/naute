@@ -1,7 +1,11 @@
 <div #scrollPositionAnchor style="position: absolute"></div>
 
 <section waIntersectionObserver waIntersectionRootMargin="50%">
-  <div style="position: absolute; left: 50%; top: 1rem; z-index: 3" class="loader loader--to-top" [class.loader--off]="!isLoadingPrevious" (waIntersectionObservee)="onScrollTop($event)"></div>
+  <div style="display: flex; align-items: center; flex-direction: column" (waIntersectionObservee)="onScrollTop($event)">
+    <img style="height: 14rem; margin-bottom: 2rem" src="assets/logo-naute.png" alt="Naute - Explore your mind">
+    <div *ngIf="isLoadingPrevious" style="margin: 2rem 0" class="loader loader--to-bottom" [class.loader--off]="!isLoadingPrevious"></div>
+    <!--<div style="margin: 2rem 0" class="loader loader--to-bottom"></div>-->
+  </div>
 
   <ul #list class="card-list" [class.card-list--is-top]="isBegin$ | async" [class.card-list--is-bottom]="isEnd$ | async">
     <li *ngFor="let note of notes$|async; trackBy:trackNoteById" style="position: relative">
@@ -9,10 +13,59 @@
     </li>
   </ul>
 
-  <div class="loader loader--to-bottom" [class.loader--off]="!isLoadingNext" (waIntersectionObservee)="onScrollBottom($event)"></div>
+  <div style="display: flex; justify-content: center;" (waIntersectionObservee)="onScrollBottom($event)">
+    <div *ngIf="isLoadingNext" style="margin: 2rem 0" class="loader loader--to-top" [class.loader--off]="!isLoadingNext"></div>
+  </div>
 </section>
 
 
-<div class="card-list__new-card">
-  <button class="card-list__new-button" (click)="createNote()">CRÉER UNE NOTE</button>
+<div class="new-note-card">
+  <div class="note" style="
+      background: white;
+      border: 1px solid var(--color-secondary);
+      border-radius: .5rem;
+      margin: 0 .5rem;
+      box-shadow: 0 0 .3rem #7c50de22, 0 .3rem .6rem #7c50de44;
+    "
+  >
+
+    <header class="note__header" style="margin-bottom: 1rem">
+      <time class="note__time" style="background: var(--color-secondary)">
+        {{ nowDate | date: 'EEEE d MMMM YYYY à H:mm' }}
+      </time>
+    </header>
+
+    <div style="display: flex; align-items: center; flex-direction: column; gap: .5rem; margin-bottom: 1.5rem">
+      <button (click)="createNote()"
+        style="
+          border: none;
+          font: inherit;
+          color: var(--color-secondary);
+          border-radius: .5rem;
+          padding: .3rem .6rem;
+          background: #f0ebff;
+        "
+      >
+        Créer une nouvelle note
+      </button>
+    </div>
+  </div>
 </div>
+
+
+<button
+  (click)="getZip()"
+  style="
+    position: fixed;
+    bottom: 0;
+    right: .5rem;
+    border: none;
+    font: inherit;
+    color: var(--color-secondary);
+    border-radius: .5rem .5rem 0 0;
+    padding: .3rem .6rem;
+    background: #f0ebff;
+  "
+>
+  Exporter toutes les notes
+</button>

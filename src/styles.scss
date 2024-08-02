@@ -7,6 +7,7 @@
 @import "styles/hypermd";
 @import "styles/card-list";
 @import "styles/loader";
+@import "styles/note";
 
 
 *, *::before, *::after {
@@ -38,11 +39,7 @@ body {
   background: var(--color-background);
   display: flex;
   justify-content: center;
-  align-items: flex-end;
-  padding: var(--view-padding);
-}
-
-body {
-  margin-top: 0;
-  padding-top: 0;
+  align-items: center;
+  margin: 0;
+  padding: var(--view-padding) 0;
 }

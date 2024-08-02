@@ -1,5 +1,9 @@
 $hidden-tokens: ".cm-formatting-header, cm-formatting-header, .cm-formatting-strong, .cm-formatting-em, .cm-formatting-strikethrough, .cm-formatting-link";
 
+.cm-s-hypermd-light {
+  background: none;
+}
+
 .cm-s-hypermd-light                          span:is(#{$hidden-tokens}).hmd-hidden-token,
 .cm-s-hypermd-light:not(.CodeMirror-focused) span:is(#{$hidden-tokens}) {
   font-size: 0 !important;

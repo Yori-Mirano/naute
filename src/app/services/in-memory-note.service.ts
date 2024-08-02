@@ -16,13 +16,13 @@ export class InMemoryNoteService implements NoteService{
   private isEnd$ = new BehaviorSubject<boolean>(false);
 
   constructor() {
-    this.generate();
+    this.generate(0);
   }
 
-  generate() {
+  generate(count: number) {
     const loremIpsumParagraph = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
 
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < count; i++) {
       const month = this.pad(Math.floor(Math.random() * 12) + 1);
       const day = this.pad(Math.floor(Math.random() * 30) + 1);
       const hours = this.pad(Math.floor(Math.random() * 24));
@@ -46,7 +46,7 @@ export class InMemoryNoteService implements NoteService{
       }
 
       note.content = content;
-      note.content = `${index + 1}`;
+      //note.content = `${index + 1}`; // TODO: remove
     })
   }
 
@@ -130,7 +130,7 @@ export class InMemoryNoteService implements NoteService{
   }
 
   getAllNotes(): Promise<Note[]> {
-    return Promise.resolve([]);
+    return Promise.resolve(this.notes);
   }
 
   isBegin(): BehaviorSubject<boolean> {

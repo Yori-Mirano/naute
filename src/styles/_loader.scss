@@ -34,25 +34,25 @@
   animation-play-state: running;
   transition: opacity 200ms;
   background-image:
-    radial-gradient(circle at 6px 50%, white var(--a), transparent calc(var(--a) + 1px)),
-    radial-gradient(circle at 50% 50%, white var(--b), transparent calc(var(--b) + 1px)),
-    radial-gradient(circle at calc(100% - 6px) 50%, white var(--c), transparent calc(var(--c) + 1px));
+    radial-gradient(circle at 6px 50%, black var(--a), transparent calc(var(--a) + 1px)),
+    radial-gradient(circle at 50% 50%, black var(--b), transparent calc(var(--b) + 1px)),
+    radial-gradient(circle at calc(100% - 6px) 50%, black var(--c), transparent calc(var(--c) + 1px));
 
   &--to-top {
     height: 3.5rem;
     width: 1rem;
     background-image:
-      radial-gradient(circle at 50% calc(100% - 6px), white var(--a), transparent calc(var(--a) + 1px)),
-      radial-gradient(circle at 50% 50%, white var(--b), transparent calc(var(--b) + 1px)),
-      radial-gradient(circle at 50% 6px, white var(--c), transparent calc(var(--c) + 1px));
+      radial-gradient(circle at 50% calc(100% - 6px), black var(--a), transparent calc(var(--a) + 1px)),
+      radial-gradient(circle at 50% 50%, black var(--b), transparent calc(var(--b) + 1px)),
+      radial-gradient(circle at 50% 6px, black var(--c), transparent calc(var(--c) + 1px));
   }
   &--to-bottom {
     height: 3.5rem;
     width: 1rem;
     background-image:
-      radial-gradient(circle at 50% 6px, white var(--a), transparent calc(var(--a) + 1px)),
-      radial-gradient(circle at 50% 50%, white var(--b), transparent calc(var(--b) + 1px)),
-      radial-gradient(circle at 50% calc(100% - 6px), white var(--c), transparent calc(var(--c) + 1px));
+      radial-gradient(circle at 50% 6px, black var(--a), transparent calc(var(--a) + 1px)),
+      radial-gradient(circle at 50% 50%, black var(--b), transparent calc(var(--b) + 1px)),
+      radial-gradient(circle at 50% calc(100% - 6px), black var(--c), transparent calc(var(--c) + 1px));
   }
 
   &--off {

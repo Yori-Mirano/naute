@@ -1,0 +1,21 @@
+/*
+ * Duration
+ */
+$duration__fast-motion    : 100ms;
+$duration__simple-motion  : 150ms;
+$duration__medium-motion  : 200ms;
+$duration__complex-motion : 300ms;
+$duration__slow-motion    : 500ms;
+
+$duration__fade-in        : $duration__medium-motion;
+$duration__fade-out       : $duration__simple-motion;
+
+/*
+ * Easing
+ */
+$easing__standard         : cubic-bezier(0.4, 0, 0.2, 1);
+$easing__decelerate       : cubic-bezier(0, 0, 0.2, 1);
+$easing__accelerate       : cubic-bezier(0.4, 0, 1, 1);
+
+$easing__in               : $easing__decelerate;
+$easing__out              : $easing__accelerate;

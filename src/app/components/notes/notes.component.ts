@@ -1,7 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
-  ElementRef,
+  ElementRef, OnDestroy,
   OnInit,
   QueryList,
   ViewChild,
@@ -13,13 +13,14 @@ import { NoteComponent } from '../note/note.component';
 import { BehaviorSubject, Observable, skip, take } from "rxjs";
 //import { FirestoreNoteService } from "../../services/firestore-note.service";
 import { InMemoryNoteService } from "../../services/in-memory-note.service";
+import { ExportNotesService } from "../../services/export-notes.service";
 
 @Component({
   selector: 'app-notes',
   templateUrl: './notes.component.html',
   styleUrls: ['./notes.component.scss']
 })
-export class NotesComponent implements OnInit {
+export class NotesComponent implements OnInit, OnDestroy {
 
   notes$!: Observable<Note[]>;
   isLoadingPrevious = false;
@@ -27,13 +28,19 @@ export class NotesComponent implements OnInit {
   autoloadLimitMax = 30;
   isBegin$?: BehaviorSubject<boolean>;
   isEnd$?: BehaviorSubject<boolean>;
+  nowDate = new Date();
+  nowDateInterval?: ReturnType<typeof setInterval>;
 
   @ViewChildren(NoteComponent) noteComponents!: QueryList<NoteComponent>;
   @ViewChild('list') listElementRef!: ElementRef;
   @ViewChild('scrollPositionAnchor') scrollPositionAnchor!: ElementRef;
 
   //constructor(private noteService: FirestoreNoteService) { }
-  constructor(private noteService: InMemoryNoteService,  private changeDetectorRef: ChangeDetectorRef ) { }
+  constructor(
+    private noteService: InMemoryNoteService,
+    private changeDetectorRef: ChangeDetectorRef,
+    private exportNotesService: ExportNotesService
+  ) { }
 
   ngOnInit(): void {
     this.getNotes();
@@ -43,6 +50,14 @@ export class NotesComponent implements OnInit {
 
     this.isBegin$ = this.noteService.isBegin();
     this.isEnd$ = this.noteService.isEnd();
+
+    this.nowDateInterval = setInterval(() => this.nowDate = new Date(), 1000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.nowDateInterval) {
+      window.clearInterval(this.nowDateInterval);
+    }
   }
 
   getNotes() {
@@ -166,5 +181,11 @@ export class NotesComponent implements OnInit {
         window.clearInterval(this.loadNextNotesIntervalRef);
       }
     })
+  }
+
+  getZip() {
+    this.noteService.getAllNotes().then(notes => {
+      this.exportNotesService.getZip(notes);
+    });
   }
 }
