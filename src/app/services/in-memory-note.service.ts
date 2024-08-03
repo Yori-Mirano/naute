@@ -7,6 +7,8 @@ import { BehaviorSubject, Observable } from "rxjs";
   providedIn: 'root'
 })
 export class InMemoryNoteService implements NoteService{
+
+  localStorageKey = 'notes';
   notes: Note[] = [];
   notes$  = new BehaviorSubject<Note[]>([]);
   step    = 10;
@@ -16,7 +18,24 @@ export class InMemoryNoteService implements NoteService{
   private isEnd$ = new BehaviorSubject<boolean>(false);
 
   constructor() {
-    this.generate(10);
+    this.loadFromLocalStorage();
+    //this.generate(1000);
+  }
+
+  loadFromLocalStorage() {
+    if (this.localStorageKey) {
+      const notes = window.localStorage.getItem(this.localStorageKey);
+
+      if (notes) {
+        this.notes = JSON.parse(notes);
+      }
+    }
+  }
+
+  saveFromLocalStorage() {
+    if (this.localStorageKey) {
+      window.localStorage.setItem(this.localStorageKey, JSON.stringify(this.notes));
+    }
   }
 
   generate(count: number) {
@@ -42,7 +61,7 @@ export class InMemoryNoteService implements NoteService{
 
       for (let line = 0, lineMax = Math.random() * 5; line < lineMax; line++) {
         content += '\n\n';
-        content += loremIpsumParagraph.slice(0, Math.floor(Math.random() * loremIpsumParagraph.length)) + '.';
+        content += loremIpsumParagraph.slice(0, Math.floor(11 + Math.random() * loremIpsumParagraph.length)) + '.';
       }
 
       note.content = content;
@@ -74,6 +93,8 @@ export class InMemoryNoteService implements NoteService{
       } else {
         this.notes.push(note);
       }
+
+      this.saveFromLocalStorage()
 
       resolve();
     });
@@ -135,6 +156,7 @@ export class InMemoryNoteService implements NoteService{
   delete(note: Note): void {
     const noteId = note.id;
     this.notes.splice(this.notes.indexOf(note), 1);
+    this.saveFromLocalStorage()
     this.refresh().then(() => console.log(`Note ${noteId} deleted`));
   }
 

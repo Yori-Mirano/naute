@@ -28,12 +28,13 @@
     display: flex;
     align-items: stretch;
     margin-top: .75rem;
-    margin-left: -1rem;
+    margin-right: auto;
+    margin-left: auto;
     z-index: 1;
     background: var(--color-primary);
-    border-radius: 0 .75rem .75rem 0;
-    transform: translate(0) scale(0);
-    transform-origin: left top;
+    border-radius: .5rem;
+    transform: scale(0);
+    transform-origin: bottom;
     width: fit-content;
     min-height: 2.5rem;
     transition-property: transform;
@@ -41,19 +42,24 @@
     transition-timing-function: motion.$easing__standard;
     pointer-events: none;
 
+    & > * + * {
+      border-left: 1px solid white !important;
+    }
+
     #{$self}:focus-within &,
     &:focus {
-      transform: translate(.25rem) scale(1);
+      transform: scale(1);
 
       > * {
         pointer-events: initial;
       }
     }
 
+    /*
     &::before, &::after {
       content: "";
       position: absolute;
-      left: 0;
+      right: 0;
       z-index: -1;
       display: block;
       width: 1.5rem;
@@ -63,16 +69,17 @@
     &::before {
       top: 0;
       transform: translateY(-100%);
-      border-bottom-left-radius: 50%;
+      border-bottom-right-radius: 50%;
       box-shadow: 0 .75rem 0 0 var(--color-primary);
     }
 
     &::after {
       bottom: 0;
       transform: translateY(100%);
-      border-top-left-radius: 50%;
+      border-top-right-radius: 50%;
       box-shadow: 0 -.75rem 0 0 var(--color-primary);
     }
+    */
   }
 
   &__time {
@@ -82,35 +89,46 @@
     border-radius: 0 0 .5rem .5rem;
     font-size: 0.8rem;
     background: black;
-    transition-property: background-color;
+    transition-property: background-color, transform, border-radius;
     transition-duration: motion.$duration__fast-motion;
     transition-timing-function: motion.$easing__standard;
   }
 
   &:focus-within &__time {
+    transform: translateY(.5rem);
+    border-radius: .5rem;
     background: var(--color-primary);
   }
 
-  &::before {
+  &::before, &::after {
     content: "";
     position: absolute;
-    left: 0;
     top: 0;
     bottom: 0;
     width: .25rem;
     background: var(--color-primary);
     transform: scaleX(0);
-    transform-origin: left;
     transition-property: transform;
     transition-duration: motion.$duration__fast-motion;
     transition-timing-function: motion.$easing__standard;
   }
 
-  &:focus-within::before {
+  &::before {
+    left: 0;
+    transform-origin: left;
+  }
+
+  &::after {
+    right: 0;
+    transform-origin: right;
+  }
+
+  &:focus-within::before,
+  /*&:focus-within::after*/ {
     transform: scaleX(1);
   }
 
-  &__close-button {
+  &__button {
     background: none;
     font-size: 0.8rem;
     padding: 0.5rem;
