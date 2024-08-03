@@ -16,7 +16,7 @@ export class InMemoryNoteService implements NoteService{
   private isEnd$ = new BehaviorSubject<boolean>(false);
 
   constructor() {
-    this.generate(0);
+    this.generate(10);
   }
 
   generate(count: number) {
@@ -67,7 +67,14 @@ export class InMemoryNoteService implements NoteService{
   persist(note: Note): Promise<void> {
     return new Promise(resolve => {
       console.log('Persist note !', note);
-      this.notes.push(note);
+      const noteIndex = this.notes.indexOf(note);
+
+      if (noteIndex >= 0) {
+        this.notes[noteIndex] = note;
+      } else {
+        this.notes.push(note);
+      }
+
       resolve();
     });
   }
@@ -126,7 +133,9 @@ export class InMemoryNoteService implements NoteService{
   }
 
   delete(note: Note): void {
-    // TODO: implement
+    const noteId = note.id;
+    this.notes.splice(this.notes.indexOf(note), 1);
+    this.refresh().then(() => console.log(`Note ${noteId} deleted`));
   }
 
   getAllNotes(): Promise<Note[]> {

@@ -32,7 +32,8 @@
     z-index: 1;
     background: var(--color-primary);
     border-radius: 0 .75rem .75rem 0;
-    transform: translate(0) scaleY(0);
+    transform: translate(0) scale(0);
+    transform-origin: left top;
     width: fit-content;
     min-height: 2.5rem;
     transition-property: transform;
@@ -42,7 +43,7 @@
 
     #{$self}:focus-within &,
     &:focus {
-      transform: translate(.25rem) scaleY(1);
+      transform: translate(.25rem) scale(1);
 
       > * {
         pointer-events: initial;
@@ -99,6 +100,7 @@
     width: .25rem;
     background: var(--color-primary);
     transform: scaleX(0);
+    transform-origin: left;
     transition-property: transform;
     transition-duration: motion.$duration__fast-motion;
     transition-timing-function: motion.$easing__standard;

@@ -30,7 +30,7 @@ export class NoteComponent implements OnInit, OnChanges {
         viewportScrollMarginTop: 100,
         viewportScrollMarginBottom: 150,
         extraKeys: {
-          "Esc": () => this.blur(),
+          "Esc": () => this.triggerEditorBlur(),
           "Ctrl-S": () => {
             if (!navigator.platform.match("Mac")) {
               this.save()
@@ -42,7 +42,7 @@ export class NoteComponent implements OnInit, OnChanges {
       });
 
       this.editor.on('change',  () => this.autosave());
-      this.editor.on('blur',    () => this.save());
+      this.editor.on('blur',    () => this.onBlur());
 
       // Forces to recalculate the visual position of the cursor after a blur which would have hidden a nearby token.
       this.editor.on('focus',   () => requestAnimationFrame(() => this.editor.refresh()));
@@ -71,13 +71,25 @@ export class NoteComponent implements OnInit, OnChanges {
     });
   }
 
-  blur() {
+  triggerEditorBlur() {
     this.textarea.nativeElement.parentNode.querySelector('.CodeMirror textarea')?.blur();
   }
 
+  onBlur() {
+    if (this.editor.getValue() === '') {
+      this.delete();
+    } else {
+      this.save();
+    }
+  }
+
   autosave() {
-    clearTimeout(this.autosaveTimeout);
+    this.clearAutosaveTimeout();
     this.autosaveTimeout = setTimeout(() => this.save(), this.autosaveDelay);
+  }
+
+  clearAutosaveTimeout(): void {
+    clearTimeout(this.autosaveTimeout);
   }
 
   save() {
@@ -97,6 +109,7 @@ export class NoteComponent implements OnInit, OnChanges {
   }
 
   delete() {
+    this.clearAutosaveTimeout();
     this.noteService.delete(this.note);
   }
 }
