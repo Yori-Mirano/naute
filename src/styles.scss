@@ -2,12 +2,14 @@
 
 @import "codemirror/lib/codemirror";
 @import "hypermd/theme/hypermd-light";
+
 @import "styles/colors";
 @import "styles/codemirror";
 @import "styles/hypermd";
 @import "styles/card-list";
 @import "styles/loader";
 @import "styles/note";
+@import "styles/taskbar";
 
 
 *, *::before, *::after {
@@ -41,5 +43,4 @@ body {
   justify-content: center;
   align-items: center;
   margin: 0;
-  padding: var(--view-padding) 0;
 }

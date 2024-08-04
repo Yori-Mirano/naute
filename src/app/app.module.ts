@@ -15,6 +15,7 @@ import { environment } from '../environments/environment';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import { IntersectionObserverModule } from "@ng-web-apis/intersection-observer";
+import { TaskbarComponent } from './components/taskbar/taskbar.component';
 
 registerLocaleData(localeFr, 'fr');  // TODO: dynamically use the current browser locale by default
 
@@ -22,7 +23,8 @@ registerLocaleData(localeFr, 'fr');  // TODO: dynamically use the current browse
   declarations: [
     AppComponent,
     NoteComponent,
-    NotesComponent
+    NotesComponent,
+    TaskbarComponent
   ],
   imports: [
     BrowserModule,

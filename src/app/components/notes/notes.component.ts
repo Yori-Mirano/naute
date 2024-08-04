@@ -1,7 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
-  ElementRef, OnDestroy,
+  ElementRef,
   OnInit,
   QueryList,
   ViewChild,
@@ -11,16 +11,14 @@ import {
 import { Note } from '../../models/note';
 import { NoteComponent } from '../note/note.component';
 import { BehaviorSubject, Observable, skip, take } from "rxjs";
-//import { FirestoreNoteService } from "../../services/firestore-note.service";
 import { InMemoryNoteService } from "../../services/in-memory-note.service";
-import { ExportNotesService } from "../../services/export-notes.service";
 
 @Component({
   selector: 'app-notes',
   templateUrl: './notes.component.html',
   styleUrls: ['./notes.component.scss']
 })
-export class NotesComponent implements OnInit, OnDestroy {
+export class NotesComponent implements OnInit {
 
   notes$!: Observable<Note[]>;
   isLoadingPrevious = false;
@@ -28,18 +26,14 @@ export class NotesComponent implements OnInit, OnDestroy {
   autoloadLimitMax = 30;
   isBegin$?: BehaviorSubject<boolean>;
   isEnd$?: BehaviorSubject<boolean>;
-  nowDate = new Date();
-  nowDateInterval?: ReturnType<typeof setInterval>;
 
   @ViewChildren(NoteComponent) noteComponents!: QueryList<NoteComponent>;
   @ViewChild('list') listElementRef!: ElementRef;
   @ViewChild('scrollPositionAnchor') scrollPositionAnchor!: ElementRef;
 
-  //constructor(private noteService: FirestoreNoteService) { }
   constructor(
     private noteService: InMemoryNoteService,
     private changeDetectorRef: ChangeDetectorRef,
-    private exportNotesService: ExportNotesService
   ) { }
 
   ngOnInit(): void {
@@ -50,14 +44,6 @@ export class NotesComponent implements OnInit, OnDestroy {
 
     this.isBegin$ = this.noteService.isBegin();
     this.isEnd$ = this.noteService.isEnd();
-
-    this.nowDateInterval = setInterval(() => this.nowDate = new Date(), 1000);
-  }
-
-  ngOnDestroy(): void {
-    if (this.nowDateInterval) {
-      window.clearInterval(this.nowDateInterval);
-    }
   }
 
   getNotes() {
@@ -68,18 +54,6 @@ export class NotesComponent implements OnInit, OnDestroy {
     const limit = window.innerHeight / 110; // TODO: à calculer dynamiquement
     this.autoloadLimitMax = limit * 4;
     return limit;
-  }
-
-  createNote() {
-    this.notes$.pipe(skip(1), take(1)).subscribe(() => {
-      requestAnimationFrame(() => {
-        this.noteComponents.last.focus();
-        window.scrollTo(0, document.body.scrollHeight);
-      });
-    });
-
-    this.noteService.create()
-      .then(() => this.noteService.loadLast());
   }
 
   loadPreviousNotes() {
@@ -181,11 +155,5 @@ export class NotesComponent implements OnInit, OnDestroy {
         window.clearInterval(this.loadNextNotesIntervalRef);
       }
     })
-  }
-
-  getZip() {
-    this.noteService.getAllNotes().then(notes => {
-      this.exportNotesService.getZip(notes);
-    });
   }
 }

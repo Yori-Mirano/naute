@@ -1,8 +1,4 @@
-@use 'shared/motion' as motion;
-
 .card-list {
-  max-width: 35rem;
-  width: 100vw;
   list-style-type: none;
   padding: 0;
   margin: 0;
@@ -16,19 +12,4 @@
   > :last-child {
     border-bottom: 1px solid #ddd;
   }
-}
-
-.new-note-card {
-  position: sticky;
-  bottom: -1rem;
-  margin-top: .5rem;
-  margin-bottom: 3rem;
-  z-index: 1;
-  transition-property: bottom;
-  transition-duration: motion.$duration__fast-motion;
-  transition-timing-function: motion.$easing__standard;
-}
-
-:has(.card-list:focus-within) ~ .new-note-card {
-  bottom: -5rem;
 }

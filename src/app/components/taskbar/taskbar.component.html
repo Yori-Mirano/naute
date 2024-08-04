@@ -1,0 +1,21 @@
+<div class="taskbar">
+  <div class="taskbar__body">
+    <button class="taskbar__button" (click)="createNote()">
+      Créer
+    </button>
+
+    <ng-container *ngIf="(notesComponent.notes$ | async)?.length">
+      <button class="taskbar__button">
+        Filtrer
+      </button>
+
+      <button class="taskbar__button" (click)="getZip()">
+        Exporter
+      </button>
+    </ng-container>
+
+    <button class="taskbar__button" (click)="generate(1)">
+      Générer
+    </button>
+  </div>
+</div>

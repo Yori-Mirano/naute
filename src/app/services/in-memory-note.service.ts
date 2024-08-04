@@ -41,7 +41,7 @@ export class InMemoryNoteService implements NoteService{
   generate(count: number) {
     const loremIpsumParagraph = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
 
-    for (let i = 0; i < count; i++) {
+    for (let i = this.notes.length, l = i + count; i < l; i++) {
       const month = this.pad(Math.floor(Math.random() * 12) + 1);
       const day = this.pad(Math.floor(Math.random() * 30) + 1);
       const hours = this.pad(Math.floor(Math.random() * 24));
