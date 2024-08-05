@@ -7,6 +7,12 @@
     <textarea #textarea [(ngModel)]="note.content" rows="1"></textarea>
   </div>
 
+  <ul style="margin: 1rem 0; display: flex; gap: .5rem; list-style-type: none; padding: 0">
+    <li *ngFor="let tag of note.cache.tags" style="background: black; color: white; border-radius: 1rem; padding: .25rem .5rem; font-size: .8rem;">
+       {{ tag }}
+    </li>
+  </ul>
+
   <footer class="note__footer">
     <button class="note__button">Créer une note associée</button>
     <button class="note__button" (click)="delete()">Supprimer</button>

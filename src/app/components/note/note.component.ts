@@ -5,6 +5,7 @@ import { Note } from '../../models/note';
 import * as HyperMD from 'hypermd';
 import { cm_t } from "hypermd";
 import { InMemoryNoteService } from "../../services/in-memory-note.service";
+import slugify from "slugify";
 
 @Component({
   selector: 'app-note',
@@ -41,7 +42,7 @@ export class NoteComponent implements OnInit, OnChanges {
         }
       });
 
-      this.editor.on('change',  () => this.autosave());
+      this.editor.on('change',  () => this.onChange());
       this.editor.on('blur',    () => this.onBlur());
 
       // Forces to recalculate the visual position of the cursor after a blur which would have hidden a nearby token.
@@ -55,13 +56,13 @@ export class NoteComponent implements OnInit, OnChanges {
       const currentNote  = changes['note'].currentValue;
 
 
-      if (this.isExternalUpdate(previousNote, currentNote)) {
+      if (this.isExternalUpdate(currentNote)) {
         this.editor.setValue(changes['note'].currentValue.content);
       }
     }
   }
 
-  isExternalUpdate(previousDate: Note, currentNote: Note): boolean {
+  isExternalUpdate(currentNote: Note): boolean {
     return this.savedAt !== currentNote.updatedAt;
   }
 
@@ -83,6 +84,26 @@ export class NoteComponent implements OnInit, OnChanges {
     }
   }
 
+  onChange() {
+    this.autosave();
+  }
+
+  cacheTitle() {
+    const titleMatch = this.note.content.match(/^# (?<title>.*)(?:\n|$)/);
+
+    if (titleMatch && titleMatch.groups && titleMatch?.groups['title']) {
+      this.note.cache.title = titleMatch?.groups['title'];
+    }
+  }
+
+  cacheTags() {
+    const hashtags = [...this.note.content.matchAll(/#(\w+)/g)];
+
+    if (hashtags) {
+      this.note.cache.tags = hashtags.map(tag => tag[1]);
+    }
+  }
+
   autosave() {
     this.clearAutosaveTimeout();
     this.autosaveTimeout = setTimeout(() => this.save(), this.autosaveDelay);
@@ -101,6 +122,8 @@ export class NoteComponent implements OnInit, OnChanges {
       clearTimeout(this.autosaveTimeout);
       this.note.content = this.editor.getValue();
       this.note.updatedAt = this.savedAt = Date.now();
+      this.cacheTitle();
+      this.cacheTags();
       this.noteService.persist(this.note);
 
     } else {

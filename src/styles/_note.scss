@@ -31,8 +31,11 @@
     margin-right: auto;
     margin-left: auto;
     z-index: 1;
-    background: var(--color-primary);
+    background: white;
+    color: var(--color-primary);
+    border: 1px solid currentColor;
     border-radius: .5rem;
+    box-shadow: 0 0 .3rem #B85FC822, 0 .3rem .6rem #B85FC844;
     transform: scale(0);
     transform-origin: bottom;
     width: fit-content;
@@ -133,6 +136,6 @@
     font-size: 0.8rem;
     padding: 0.5rem;
     border: none;
-    color: white;
+    color: inherit;
   }
 }

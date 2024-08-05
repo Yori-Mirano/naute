@@ -31,7 +31,11 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
   create(): Promise<void> {
     const note = {
       createdAt: Date.now(),
-      content: ''
+      content: '',
+      cache: {
+        title: '',
+        tags: [],
+      }
     };
 
     return this.persist(note);
@@ -199,7 +203,11 @@ export class FirestoreNoteService implements NoteService, OnDestroy {
       id:         firestoreNote.id,
       createdAt:  firestoreNote.createdAt.toMillis(),
       updatedAt:  firestoreNote.updatedAt ? firestoreNote.updatedAt.toMillis() : undefined,
-      content:    firestoreNote.content
+      content:    firestoreNote.content,
+      cache: {
+        title: '',
+        tags: [],
+      }
     }
   }
 

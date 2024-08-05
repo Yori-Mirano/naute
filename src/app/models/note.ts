@@ -3,4 +3,8 @@ export interface Note {
   createdAt: number;
   updatedAt?: number;
   content: string;
+  cache: {
+    title: string;
+    tags: Array<string>;
+  }
 }

@@ -50,14 +50,19 @@ export class InMemoryNoteService implements NoteService{
       this.notes.push({
         id: `${i}`,
         createdAt: Date.parse(`2022-${month}-${day}T${hours}:${minutes}`),
-        content: ''
+        content: '',
+        cache: {
+          title: '',
+          tags: [],
+        }
       });
     }
 
     this.notes.sort((noteA, noteB) => noteA.createdAt > noteB.createdAt ? 1 : -1)
 
     this.notes.forEach((note, index) => {
-      let content = `# Lorem ipsum ${index+1}`;
+      const title = `# Lorem ipsum ${index+1}`;
+      let content = title;
 
       for (let line = 0, lineMax = Math.random() * 5; line < lineMax; line++) {
         content += '\n\n';
@@ -65,6 +70,8 @@ export class InMemoryNoteService implements NoteService{
       }
 
       note.content = content;
+      note.cache.title = title;
+
       //note.content = `${index + 1}`; // TODO: remove
     })
   }
@@ -77,7 +84,11 @@ export class InMemoryNoteService implements NoteService{
     const note = {
       id: `${this.notes.length}`,
       createdAt: Date.now(),
-      content: ''
+      content: '',
+      cache: {
+        title: '',
+        tags: [],
+      }
     };
 
     return this.persist(note);
